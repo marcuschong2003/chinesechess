@@ -1,0 +1,21 @@
+*{
+    padding: 0%;
+    margin: 0; 
+}body{
+    height: 100vh;
+    width: 100vw;
+}#board{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #cccccc;
+}
+#chessboard{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background-color: rgb(238, 219, 185);
+}
