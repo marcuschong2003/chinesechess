@@ -1,3 +1,5 @@
+const { read } = require("original-fs");
+
 var board = [["C","M","X","S","J","S","X","M","C"],
              [0,0,0,0,0,0,0,0,0],
              [0,"P",0,0,0,0,0,"P",0],
@@ -14,7 +16,15 @@ var selected = false;
 var selectedx = -1;
 var selectedy = -1;
 var type = "";
+var turn =0;
 ctx.beginPath();
+function returnturn(){
+    if(turn%2){
+        return "black";
+    }else{
+        return "red";
+    }
+}
 function drawcanvas(){
     ctx.fillStyle = "#eedbb9";
     ctx.fillRect(0,0,540,600);
@@ -88,6 +98,222 @@ function drawcanvas(){
     }
 }
 drawcanvas();
+function typeofarmy(type){
+    if(type!=0){
+        if(type == type.toUpperCase()){
+            return "black";
+        }else{
+            return "red";
+        }
+    }else{
+        return 0;
+    }
+}
+function isvalid(type,yori,xori,ynew,xnew){
+    if(typeofarmy(type)==typeofarmy(board[ynew][xnew])){
+        return false
+    }
+    if(type.toUpperCase()=="M"){
+        if(Math.abs(ynew-yori)==2){
+            if(ynew>yori){
+                if(board[yori+1][xori]!=0){
+                    return false;
+                }
+            }else{
+                if(board[yori-1][xori]!=0){
+                    return false;
+                }
+            }
+        }else if(Math.abs(xnew-xori)==2){
+            if(xnew>xori){
+                if(board[yori][xori+1]!=0){
+                    return false
+                }
+            }else{
+                if(board[yori][xori-1]!=0){
+                    return false
+                }
+            }
+        }
+        if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))==5)){
+            return true;
+        }
+    }else if(type.toUpperCase()=="J"){
+        if(xnew<3||xnew>5){
+            return false;
+        }
+        if(type ="J"){
+            if(ynew>2){
+                return false;
+            }
+        }else{
+            if(ynew<7){
+                return false;
+            }
+        }
+        if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))==1)){
+            return true;
+        }
+    }else if(type.toUpperCase()=="S"){
+        if(xnew<3||xnew>5){
+            return false;
+        }
+        if(type== "S"){
+            if(ynew>2){
+                return false;
+            }
+        }else{
+            if(ynew<7){
+                return false;
+            }
+        }
+        if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))==2)){
+            return true;
+        }
+    }else if(type.toUpperCase()=="X"){
+        if(type== "X"){
+            if(ynew>4){
+                return false;
+            }
+        }else{
+            if(ynew<5){
+                return false;
+            }
+        }
+        if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))==8)&&(board[(yori+ynew)/2][(xori+xnew)/2]==0)){
+            return true;
+        }
+    }else if(type.toUpperCase()=="B"){
+        if(type == "B"){
+            if(ynew<yori){
+                return false;
+            }
+            if(yori<5){
+                if(xnew!=xori){
+                    return false;
+                }
+            }
+        }else{
+            if(ynew>yori){
+                return false;
+            }
+            if(yori>4){
+                if(xnew!=xori){
+                    return false;
+                }
+            }
+        }
+        if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))==1)){
+            return true;
+        }
+    }else if(type.toUpperCase()=="C"){
+        if((xori!=xnew)&&(yori!=ynew)){
+            return false;
+        }
+        if(xori==xnew){
+            if(yori>ynew){
+                for(var q=ynew+1;q<=yori;q++){
+                    if(board[q][xori]!=0){
+                        return false
+                    }
+                }
+            }else{
+                for(var q=yori+1;q<ynew;q++){
+                    if(board[q][xori]!=0){
+                        return false
+                    }
+                }
+            }
+        }if(yori==ynew){
+            if(xori>xnew){
+                for(var q=xnew+1;q<=xori;q++){
+                    if(board[yori][q]!=0){
+                        return false
+                    }
+                }
+            }else{
+                for(var q=xori+1;q<xnew;q++){
+                    if(board[yori][q]!=0){
+                        return false
+                    }
+                }
+            }
+        }
+        return true;
+    }else if((type.toUpperCase()=="P")){
+        if(((xori!=xnew)&&(yori!=ynew))||((xori==xnew)&&(yori==ynew))){
+            return false;
+        }
+        if(board[ynew][xnew]==0){
+            if(xori==xnew){
+                if(yori>ynew){
+                    for(var q=ynew;q<=yori;q++){
+                        if(board[q][xori]!=0){
+                            return false
+                        }
+                    }
+                }else{
+                    for(var q=yori+1;q<=ynew;q++){
+                        if(board[q][xori]!=0){
+                            return false
+                        }
+                    }
+                }
+            }if(yori==ynew){
+                if(xori>xnew){
+                    for(var q=xnew;q<=xori;q++){
+                        if(board[yori][q]!=0){
+                            return false
+                        }
+                    }
+                }else{
+                    for(var q=xori+1;q<=xnew;q++){
+                        if(board[yori][q]!=0){
+                            return false
+                        }
+                    }
+                }
+            }
+            return true;
+        }else{
+            middle = 0
+            if(xori==xnew){
+                if(yori>ynew){
+                    for(var q=ynew+1;q<=yori;q++){
+                        if(board[q][xori]!=0){
+                            middle = middle +1;
+                        }
+                    }
+                }else{
+                    for(var q=yori+1;q<ynew;q++){
+                        if(board[q][xori]!=0){
+                            middle = middle +1;
+                        }
+                    }
+                }
+            }if(yori==ynew){
+                if(xori>xnew){
+                    for(var q=xnew+1;q<=xori;q++){
+                        if(board[yori][q]!=0){
+                            middle = middle +1;
+                        }
+                    }
+                }else{
+                    for(var q=xori+1;q<xnew;q++){
+                        if(board[yori][q]!=0){
+                            middle = middle +1;
+                        }
+                    }
+                }
+            }
+            if(middle==1){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+}
 canvas.addEventListener("mousedown",function(e){
     var x = Math.floor(e.clientX-canvas.getBoundingClientRect().left);
     var y = Math.floor(e.clientY-canvas.getBoundingClientRect().top);
@@ -98,16 +324,21 @@ canvas.addEventListener("mousedown",function(e){
         selectedy = arrayy;
         if(board[selectedy][selectedx]!=0){
             type = board[selectedy][selectedx];
-            board[selectedy][selectedx] = 0;
-            drawcanvas();
-            selected = true;
+            if(typeofarmy(type)==returnturn()){
+                board[selectedy][selectedx] = 0;
+                drawcanvas();
+                selected = true;
+            }
         }
     }else{
-        selectedx = arrayx;
-        selectedy = arrayy;
-        board[selectedy][selectedx] = type;
-        drawcanvas();
-        selected = false;
+        if(isvalid(type,selectedy,selectedx,arrayy,arrayx)){
+            selectedx = arrayx;
+            selectedy = arrayy;
+            board[selectedy][selectedx] = type;
+            drawcanvas();
+            selected = false;
+            turn = turn +1;
+        }
     }
     console.log(selectedx,selectedy);
 });
