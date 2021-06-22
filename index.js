@@ -338,5 +338,4 @@ canvas.addEventListener("mousedown",function(e){
             turn = turn +1;
         }
     }
-    console.log(selectedx,selectedy);
 });
