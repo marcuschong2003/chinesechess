@@ -1,5 +1,3 @@
-const { read } = require("original-fs");
-
 var board = [["C","M","X","S","J","S","X","M","C"],
              [0,0,0,0,0,0,0,0,0],
              [0,"P",0,0,0,0,0,"P",0],
