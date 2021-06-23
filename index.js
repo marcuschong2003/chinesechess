@@ -9,11 +9,13 @@ var board = [["C","M","X","S","J","S","X","M","C"],
              [0,0,0,0,0,0,0,0,0],
              ["c","m","x","s","j","s","x","m","c"]]
 var canvas = document.getElementById("chessboard");
+var text = document.getElementById("text");
 var ctx = canvas.getContext("2d");
 var selected = false;
 var selectedx = -1;
 var selectedy = -1;
 var type = "";
+var game = "";
 var turn =0;
 ctx.beginPath();
 function returnturn(){
@@ -117,19 +119,45 @@ function isvalid(type,yori,xori,ynew,xnew){
                 if(board[yori+1][xori]!=0){
                     return false;
                 }
+                if(typeofarmy(type)=="black"){
+                    game = game+"马"+(xori+1)+"进"+(xnew+1) + "\n"
+                }else{
+                    game = game+ "马"+(xori+1)+"退"+(xnew+1) + " "
+                }
+                
             }else{
                 if(board[yori-1][xori]!=0){
                     return false;
                 }
+                if(typeofarmy(type)=="red"){
+                    game = game+ "马"+(xori+1)+"进"+(xnew+1) + " "
+                }else{
+                    game = game+"马"+(xori+1)+"退"+(xnew+1) + "\n"
+                }
+                
             }
         }else if(Math.abs(xnew-xori)==2){
             if(xnew>xori){
                 if(board[yori][xori+1]!=0){
                     return false
                 }
+                
             }else{
                 if(board[yori][xori-1]!=0){
                     return false
+                }
+            }
+            if(ynew>yori){
+                if(typeofarmy(type)=="black"){
+                    game = game+ "马"+(xori+1)+"进"+(xnew+1) + "\n"
+                }else{
+                    game = game+ "马"+(xori+1)+"退"+(xnew+1) + " "
+                }
+            }else{
+                if(typeofarmy(type)=="red"){
+                    game = game+ "马"+(xori+1)+"进"+(xnew+1) + " "
+                }else{
+                    game = game+ "马"+(xori+1)+"退"+(xnew+1) + "\n"
                 }
             }
         }
@@ -137,21 +165,40 @@ function isvalid(type,yori,xori,ynew,xnew){
             return true;
         }
     }else if(type.toUpperCase()=="J"){
+        if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))!=1)){
+            return false;
+        }
+        if((ynew!=yori)&&(xnew!=xori)){
+            return false;
+        }
         if(xnew<3||xnew>5){
             return false;
         }
-        if(type ="J"){
-            if(ynew>2){
-                return false;
-            }
-        }else{
+        if(type = "j"){
             if(ynew<7){
                 return false;
             }
+            if(ynew>yori){
+                game = game+ "将"+(xori+1)+"退"+1 + " "
+            }else if(ynew<yori){
+                game = game+ "将"+(xori+1)+"进"+1 + " "
+            }else{
+                game = game+ "将"+(xori+1)+"平"+(xnew+1) + " "
+            }
+        }else{
+            if(ynew>2){
+                return false;
+            }
+            if(ynew<yori){
+                game = game+ "将"+(xori+1)+"退"+1 + "\n"
+            }else if(ynew>yori){
+                game = game+ "将"+(xori+1)+"进"+1+ "\n"
+            }else{
+                game = game+ "将"+(xori+1)+"平"+(xnew+1) + "\n"
+            }
         }
-        if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))==1)){
-            return true;
-        }
+        
+        return true;
     }else if(type.toUpperCase()=="S"){
         if(xnew<3||xnew>5){
             return false;
@@ -160,9 +207,19 @@ function isvalid(type,yori,xori,ynew,xnew){
             if(ynew>2){
                 return false;
             }
+            if(ynew<yori){
+                game = game+ "士"+(xori+1)+"退"+(xnew+1) + "\n"
+            }else{
+                game = game+ "士"+(xori+1)+"进"+(xnew+1) + "\n"
+            }
         }else{
             if(ynew<7){
                 return false;
+            }
+            if(ynew>yori){
+                game = game+ "士"+(xori+1)+"退"+(xnew+1) + " "
+            }else{
+                game = game+ "士"+(xori+1)+"进"+(xnew+1) + " "
             }
         }
         if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))==2)){
@@ -173,9 +230,19 @@ function isvalid(type,yori,xori,ynew,xnew){
             if(ynew>4){
                 return false;
             }
+            if(ynew<yori){
+                game = game+ "相"+(xori+1)+"退"+(xnew+1) + "\n"
+            }else{
+                game = game+ "相"+(xori+1)+"进"+(xnew+1) + "\n"
+            }
         }else{
             if(ynew<5){
                 return false;
+            }
+            if(ynew>yori){
+                game = game+ "相"+(xori+1)+"退"+(xnew+1) + " "
+            }else{
+                game = game+ "相"+(xori+1)+"进"+(xnew+1) + " "
             }
         }
         if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))==8)&&(board[(yori+ynew)/2][(xori+xnew)/2]==0)){
@@ -201,6 +268,16 @@ function isvalid(type,yori,xori,ynew,xnew){
                 }
             }
         }
+        if(ynew!=yori){
+            game = game + "兵" + (xori+1) + "进" + 1
+        }else{
+            game = game + "兵" + (xori+1) + "平" + (xnew+1)
+        }
+        if(type == "B"){
+            game = game + "\n"
+        }else{
+            game = game + " "
+        }
         if((((yori-ynew)*(yori-ynew)+(xori-xnew)*(xori-xnew))==1)){
             return true;
         }
@@ -215,11 +292,21 @@ function isvalid(type,yori,xori,ynew,xnew){
                         return false
                     }
                 }
+                if(type == "c"){
+                    game = game + "车" + (xori+1) + "进" + (yori-ynew) + " ";
+                }else{
+                    game = game + "车" + (xori+1) + "退" + (yori-ynew)+ "\n";
+                }
             }else{
                 for(var q=yori+1;q<ynew;q++){
                     if(board[q][xori]!=0){
                         return false
                     }
+                }
+                if(type == "C"){
+                    game = game + "车" + (xori+1) + "进" + (ynew-yori)+ "\n";
+                }else{
+                    game = game + "车" + (xori+1) + "退" + (ynew-yori)+" ";
                 }
             }
         }if(yori==ynew){
@@ -236,6 +323,12 @@ function isvalid(type,yori,xori,ynew,xnew){
                     }
                 }
             }
+            game = game + "车" + (xori+1) + "平" + (xnew+1);
+            if(type == "c"){
+                game = game + " "
+            }else{
+                game = game + "\n"
+            }
         }
         return true;
     }else if((type.toUpperCase()=="P")){
@@ -250,11 +343,21 @@ function isvalid(type,yori,xori,ynew,xnew){
                             return false
                         }
                     }
+                    if(type == "P"){
+                        game = game + "炮" + (xori+1) + "退" + (yori-ynew)+ "\n";
+                    }else{
+                        game = game + "炮" + (xori+1) + "进" + (yori-ynew)+" ";
+                    }
                 }else{
                     for(var q=yori+1;q<=ynew;q++){
                         if(board[q][xori]!=0){
                             return false
                         }
+                    }
+                    if(type == "P"){
+                        game = game + "炮" + (xori+1) + "进" + (ynew-yori)+ "\n";
+                    }else{
+                        game = game + "炮" + (xori+1) + "退" + (ynew-yori)+" ";
                     }
                 }
             }if(yori==ynew){
@@ -270,6 +373,12 @@ function isvalid(type,yori,xori,ynew,xnew){
                             return false
                         }
                     }
+                }
+                game = game + "炮" + (xori+1) + "平" + (xnew+1);
+                if(type =="P"){
+                    game = game + "\n";
+                }else{
+                    game = game + " ";
                 }
             }
             return true;
@@ -305,6 +414,28 @@ function isvalid(type,yori,xori,ynew,xnew){
                 }
             }
             if(middle==1){
+                if(yori==ynew){
+                    game = game + "炮" + (xori+1) + "平" + (xnew+1);
+                    if(type =="P"){
+                        game = game + "\n";
+                    }else{
+                        game = game + " ";
+                    }
+                }else{
+                    if(yori>ynew){
+                        if(type == "P"){
+                            game = game + "炮" + (xori+1) + "退" + (yori-ynew)+ "\n";
+                        }else{
+                            game = game + "炮" + (xori+1) + "进" + (yori-ynew)+" ";
+                        }
+                    }else{
+                        if(type == "P"){
+                            game = game + "炮" + (xori+1) + "进" + (ynew-yori)+ "\n";
+                        }else{
+                            game = game + "炮" + (xori+1) + "退" + (ynew-yori)+" ";
+                        }
+                    }
+                }
                 return true;
             }else{
                 return false;
@@ -336,6 +467,7 @@ canvas.addEventListener("mousedown",function(e){
             drawcanvas();
             selected = false;
             turn = turn +1;
+            document.getElementById("textmove").value = game;
         }
     }
 });
