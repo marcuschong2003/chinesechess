@@ -16,6 +16,17 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-100%,-50%);
     background-color: rgb(238, 219, 185);
+}
+#textmove{
+    font-size: 30px;
+    user-select: none;
+    position: absolute;
+    height: 600px;
+    width: 340px;
+    top: 50%;
+    right: 20%;
+    transform: translate(0,-50%);
+    z-index: 9;
 }
